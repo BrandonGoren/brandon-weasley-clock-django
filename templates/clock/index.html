@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weasley Clock</title>
+      {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'clock/css/clock.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <nav class="navbar navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-header">
+      <a class="navbar-brand" href="/">Weasley Clock</a>
+            </div>
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/manage-profile/">Profile</a>
+        </li>
+      </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <a href="/log-out/">Log Out</a>
+      </li>
+    </ul>
+        </div>
+  </nav>
+  <div class="container">
+      <div class="white-slate">
+  <h1 class="clock-page-title text-center">{{user_profile.display_name_text}}'s Clocks</h1>
+        {% for clock in clocks %}
+        <div class="clock-tab">
+          <div class="row">
+        <div class="col-xs-1">
+        </div>
+        <div class="col-xs-11">
+          <h2 class="clock-name"><a href="/clock/{{ clock.id }}/">{{ clock.name_text }}</a></h2>
+        </div>
+        </div>
+        </div>
+        {% endfor %}
+  </div>
+  <div class="new-clock-button">
+    <!-- <button class="btn btn-success btn-lg">+ Add New Clock</button> -->
+    <a class="btn btn-success btn-lg" href="/create-clock" role="button">Create Clock</a>
+  </div>
+</div>
+</body>
+</html>

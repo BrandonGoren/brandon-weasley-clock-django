@@ -1,0 +1,56 @@
+.navbar-custom {
+    background-color: #2c3e50;
+    color:#ffffff;
+    border-radius:0;
+}
+
+.navbar-custom .navbar-nav > li > a {
+    color:#fff;
+}
+.navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+    color: #ffffff;
+    background-color:transparent;
+}
+.navbar-custom .navbar-brand {
+    color:#eeeeee;
+}
+
+nav>li>a:focus, .nav>li>a:hover {
+    text-decoration: none;
+    background-color: #2980b9;
+}
+
+body {
+  background-color: #ecf0f1;
+}
+
+.clock-page-title {
+  align: center;
+  padding: .5em 0em;
+}
+
+.white-slate {
+  margin: 1em 0 1em 0;
+  background-color: white;
+  padding: .5em 1em .5em 1em;
+  border-radius: 1em;
+}
+
+.clock-tab {
+  border-style: solid;
+  border-width: 5px;
+  border-color: #2980b9;
+  background-color: #2980b9;
+  margin: 1em;
+  padding: .5em;
+  border-radius: 1em;
+}
+
+.clock-name>a {
+  color: white;
+}
+
+.new-clock-button {
+  margin-top: 2em;
+  float: right;
+}

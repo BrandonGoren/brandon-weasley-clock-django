@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weasley Clock</title>
+      {% load static %}
+      {% load bootstrap3 %}
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'clock/css/clock.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <nav class="navbar navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-header">
+      <a class="navbar-brand" href="/">Weasley Clock</a>
+            </div>
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/manage-profile/">Profile</a>
+        </li>
+      </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <a href="/log-out/">Log Out</a>
+      </li>
+    </ul>
+        </div>
+  </nav>
+  <div class="container">
+        <form method="post" action="/clock/manage-states-post/">
+    {{ formset.management_form }}
+    <table>
+        {% for form in formset %}
+              <div class="white-slate">
+        {% bootstrap_form form %}
+      </div>
+        {% endfor %}
+    </table>
+    {% csrf_token %}
+     <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+  </div>
+</div>
+</body>
+</html>

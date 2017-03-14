@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ clock.name_text }}</title>
+      {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'clock/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'clock/css/clock.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <nav class="navbar navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-header">
+      <a class="navbar-brand" href="/">Weasley Clock</a>
+            </div>
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/manage-profile/">Profile</a>
+        </li>
+      </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <a href="/log-out/">Log Out</a>
+      </li>
+    </ul>
+        </div>
+  </nav>
+  <div class="container">
+    <h1>{{ clock.name_text }}</h1>
+    <ul>
+    {% for state in states %}
+        <li>{{ state.name_text }}
+        <ul>
+            {% for current_state in state.current_state_to_state.all %}
+            <li>{{ current_state.userProfile.display_name_text }}</li>
+    {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+    <div class="new-clock-button">
+      <!-- <button class="btn btn-success btn-lg">+ Add New Clock</button> -->
+      <a class="btn btn-success btn-lg" href="/clock/{{ clock.id }}/manage-states" role="button">Manage States</a>
+    </div>
+  </div>
+</body>
+</html>
