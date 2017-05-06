@@ -1,8 +1,0 @@
-{% extends 'base.html' %} {% load crispy_forms_tags %}
-{% block content %}
-<h1>Create New Clock</h1>
-<form action="/create-clock-object/" method="post">
-  {% csrf_token %} {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="Submit">
-</form>
-{% endblock %}

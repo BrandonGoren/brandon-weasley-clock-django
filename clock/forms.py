@@ -1,16 +1,21 @@
-from django import forms
-# from django.forms import formset_factory
+from django.forms import ModelForm, Form, PasswordInput, CharField, IntegerField
+from clock.models import Clock
 
 
-class LoginForm(forms.Form):
-    username = forms.CharField(label='Username')
-    password = forms.CharField(label='Password', widget=forms.PasswordInput())
+class LoginForm(Form):
+    username = CharField(label='Username')
+    password = CharField(label='Password', widget=PasswordInput())
 
 
-class ClockForm(forms.Form):
-    name = forms.CharField(label='Clock Name')
+class ClockForm(ModelForm):
+    # name = forms.CharField(label='Clock Name')
+    # description = forms.CharField(label='Description')
+
+    class Meta:
+        model = Clock
+        fields = ['name', 'description']
 
 
-class StateForm(forms.Form):
-    name = forms.CharField(label='State Name')
-    position = forms.IntegerField(label='Position')
+class StateForm(Form):
+    name = CharField(label='State Name')
+    position = IntegerField(label='Position')

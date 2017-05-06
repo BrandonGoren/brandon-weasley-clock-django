@@ -1,17 +1,32 @@
 {% extends 'base.html' %} {% block content %}
 <h1 class="text-primary">{{ clock.name }}</h1>
-  {% for state in states %}
-  <div class="card">
-    <div class="card-block">
-      <h2 class="card-title">{{ state.name }}</h2>
+<p>
+  {{ clock.description|default:"" }}
+</p>
+{% for state in states %}
+<div class="card">
+  <div class="card-block">
+    <div class="row vertical-align">
+      <div class="col-sm-3">
+        <h2>{{ state.name }}</h2>
+      </div>
+      <div class="col-sm-9">
         {% for current_state in state.current_state_to_state.all %}
-        {{ current_state.userProfile.display_name }}
+        {% if current_state.user_profile.avatar %}
+        <img src='{{ current_state.user_profile.avatar.url}}' class="rounded-circle avatar-state-img"/>
+        {% endif %}
         {% endfor %}
     </div>
   </div>
-  {% endfor %}
-<div class="new-clock-button">
-  <!-- <button class="btn btn-success btn-lg">+ Add New Clock</button> -->
-  <a class="btn btn-success btn-lg mt-3" href="/clock/{{ clock.id }}/manage-states" role="button">Manage States</a>
+    </div>
 </div>
+{% empty %}
+<div class="card">
+  <div class="card-block">
+    <h3>No states available</h3>
+  </div>
+</div>
+{% endfor %}
+  <a class="btn btn-primary btn-lg mt-3" href="/clock/{{ clock.id }}/manage-states/" role="button">Manage States</a>
+  <a class="btn btn-primary btn-lg mt-3" href="/edit-clock/{{clock.id}}" role="button">Edit Clock</a>
 {% endblock %}

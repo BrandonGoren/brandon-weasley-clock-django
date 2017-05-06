@@ -118,10 +118,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-
+ENV_PATH = os.path.abspath(os.path.dirname(__file__))
+STATIC_ROOT = os.path.join(ENV_PATH, 'static/')
 STATIC_URL = '/static/'
 
-MEDIA_ROOT='/Users/brandon/Documents/Programming/weasley_clock/clock/media'
+# MEDIA_ROOT='/Users/brandon/Documents/Programming/weasley_clock/clock/media/'
+MEDIA_ROOT = os.path.join(ENV_PATH, 'media/')
 MEDIA_URL='/media/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

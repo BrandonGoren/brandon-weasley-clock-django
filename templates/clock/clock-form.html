@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %}
+{% block content %}
+{% if form.instance.id %}
+<h1>Edit {{form.instance}}</h1>
+{% else %}
+<h1>Create New Clock</h1>
+{% endif %}
+<form action="/edit-clock/{{form.instance.id|default:""  }}" method="POST">
+  {% csrf_token %} {{ form|crispy }}
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+{% endblock %}

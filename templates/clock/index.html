@@ -6,13 +6,13 @@
     <a href="/clock/{{ clock.id }}/">
       <h2 class="card-title">{{ clock.name }}</h2></a>
     <div class="card-text">
-      A description of each clock goes here
+      {% firstof clock.description '' %}
     </div>
   </div>
 </div>
 {% endfor %}
 <div class="new-clock-button">
   <!-- <button class="btn btn-success btn-lg">+ Add New Clock</button> -->
-  <a class="btn btn-success btn-lg mt-2" href="/create-clock" role="button">Create Clock</a>
+  <a class="btn btn-success btn-lg mt-2" href="/create-clock/" role="button">Create Clock</a>
 </div>
 {% endblock %}

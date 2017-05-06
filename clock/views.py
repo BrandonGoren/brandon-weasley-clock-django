@@ -13,7 +13,7 @@ from django.forms import formset_factory, modelformset_factory
 def index(request):
     if request.user.is_authenticated:
         context = {
-            'clocks': Clock.objects.filter(userProfiles__user=request.user),
+            'clocks': Clock.objects.filter(user_profiles__user=request.user).order_by('name'),
             'user_profile': UserProfile.objects.get(user=request.user)
         }
         return render(request, 'clock/index.html', context)
@@ -21,27 +21,10 @@ def index(request):
         context = {'form': LoginForm()}
         return render(request, 'clock/sign-in.html', context)
 
-
-def login_user(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return redirect('index')
-    else:
-        return render(request, 'clock/sign-in.html', {'form': LoginForm()})
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('index')
-
-
 def clock_view(request, clock_id):
     clock = Clock.objects.get(id=clock_id)
     states = State.objects.filter(clock=clock)
-    current_states = CurrentState.objects.filter(clock=clock)
+    current_states = CurrentState.objects.filter(clock=clock).order_by('position')
     context = {
         'clock': clock,
         'states': states,
@@ -50,23 +33,36 @@ def clock_view(request, clock_id):
     return render(request, 'clock/clock-view.html', context)
 
 
-def create_clock_form(request):
+def clock_form(request, clock_id=None):
     if request.user.is_authenticated:
-        context = {'form': ClockForm()}
-        return render(request, 'clock/create-clock.html', context)
+        new_clock = clock_id is None
+        if request.method == 'POST':
+            if new_clock:
+                form = ClockForm(request.POST)
+            else:
+                clock = Clock.objects.get(id=clock_id)
+                form = ClockForm(request.POST, instance=clock)
+            if form.is_valid():
+                clock = form.save()
+                if new_clock:
+                    requester_profile = UserProfile.objects.get(user=request.user)
+                    clock.user_profiles.add(requester_profile)
+                    clock.save()
+                    CurrentState.objects.create(
+                        clock=clock, user_profile=requester_profile)
+                return redirect('/clock/{0}'.format(clock.id))
+            else:
+                return render(request, 'clock/clock-form.html', {'form': form})
+        else:
+            if new_clock:
+                form = ClockForm()
+            else:
+                clock = Clock.objects.get(id=clock_id)
+                form = ClockForm(instance=clock)
+            return render(request, 'clock/clock-form.html', {'form': form})
     else:
         context = {'form': LoginForm()}
         return render(request, 'clock/sign-in.html', context)
-
-
-def create_clock_object(request):
-    name = request.POST['name']
-    clock = Clock.objects.create(name=name)
-    requester_profile = UserProfile.objects.get(user__username=request.user)
-    clock.userProfiles.add(requester_profile)
-    clock.save()
-    CurrentState.objects.create(clock=clock, userProfile=requester_profile)
-    return redirect('clock/{0}'.format(clock.id))
 
 
 @csrf_exempt
@@ -75,7 +71,7 @@ def update_location(request):
     latitude = request.POST['latitude']
     longitude = request.POST['longitude']
     location_conditions = LocationCondition.objects.filter(
-        userProfile__user__username=username)
+        user_profile__user__username=username)
     potential_clock_states_to_change = []
     for condition in location_conditions:
         if great_circle((latitude, longitude), (condition.latitude, condition.longitude)).miles <= \
@@ -84,9 +80,9 @@ def update_location(request):
                 (condition.state.clock, condition.state))
     for clockState in potential_clock_states_to_change:
         current_state = CurrentState.objects.get(
-            clock=clockState[0], userProfile__user__username=username)
+            clock=clockState[0], user_profile__user__username=username)
         current_state.state = clockState[1]
-        current_state.last_modified= timezone.now()
+        current_state.last_modified = timezone.now()
         current_state.save()
     return HttpResponse(status=200)
 
@@ -113,7 +109,7 @@ def get_user_profiles_from_clock_id(request, clock_id):
     username = request.POST('username')
     clock = Clock.objects.get(id=clock_id)
     if clock.has_permission(username):
-        return HttpResponse(serializers.serialize('json', clock.userProfiles.all()))
+        return HttpResponse(serializers.serialize('json', clock.user_profiles.all()))
     else:
         return HttpResponse(status=550)
 
@@ -121,24 +117,21 @@ def get_user_profiles_from_clock_id(request, clock_id):
 def add_user_to_clock(requester, clock_id):
     user_profile = UserProfile.objects.get(user__username=requester)
     clock = Clock.objects.get(id=clock_id)
-    clock.UserProfiles.add(user_profile)
+    clock.user_profiles.add(user_profile)
     clock.save()
-    CurrentState.objects.create(clock=clock, userProfile=user_profile)
+    CurrentState.objects.create(clock=clock, user_profile=user_profile)
     return HttpResponse(status=200)
 
 
 def manage_states(request, clock_id):
-    ManageStates = modelformset_factory(State, exclude=('id', 'clock'))
+    clock = Clock.objects.get(id=clock_id)
+    manage_states = modelformset_factory(State, exclude=('id', 'clock'))
     states = State.objects.filter(clock__id=clock_id)
-    formset = ManageStates(queryset=states)
+    formset = manage_states(queryset=states)
     return render(request, 'clock/manage-states.html', {
+        'clock': clock,
         'formset': formset
     })
-
-
-def manage_states_post(request):
-    print(request.POST)
-    return HttpResponse(status=200)
 
 
 def create_state(request, clock_id):
@@ -158,3 +151,20 @@ def update_current_state(request):
     current_state.lastChanged_datetime = timezone.now()
     current_state.save()
     return HttpResponse(status=200)
+
+
+def login_user(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return redirect('index')
+    else:
+
+        return render(request, 'clock/sign-in.html', {'form': LoginForm(), 'error': 'Invaild username or password'})
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('index')

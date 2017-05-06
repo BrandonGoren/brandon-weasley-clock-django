@@ -9,21 +9,22 @@ class UserProfile(models.Model):
     avatar = models.ImageField(blank=True, null=True)
 
     def __str__(self):
-        return str(self.user)
+        return '{0} ({1})'.format(self.display_name, self.user.username)
 
 
 class Clock(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=200, null=True)
-    userProfiles = models.ManyToManyField(
+    description = models.CharField(max_length=500, null=True, blank=True)
+    user_profiles = models.ManyToManyField(
         UserProfile, related_name='users_clock')
 
     def has_permission(self, username):
-        return username in str(self.userProfiles.all())
+        return username in str(self.user_profiles.all())
 
     def __str__(self):
-        return self.name_text
+        return self.name
 
 
 class State(models.Model):
@@ -33,15 +34,15 @@ class State(models.Model):
     position = models.IntegerField(default=0)
 
     def get_user_profiles_in_state(self):
-        return self.current_state_to_state.all().values('userProfile__display_name_text')
+        return self.current_state_to_state.all().values('user_profile__display_name')
 
     def __str__(self):
-        return '{0} - {1}'.format(self.clock.name_text, self.name_text)
+        return '{0} - {1}'.format(self.clock.name, self.name)
 
 
 class CurrentState(models.Model):
     id = models.AutoField(primary_key=True)
-    userProfile = models.ForeignKey(
+    user_profile = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name='user_state')
     clock = models.ForeignKey(Clock, on_delete=models.CASCADE)
     state = models.ForeignKey(
@@ -50,13 +51,16 @@ class CurrentState(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '{0} State for {1} - {2}'.format(self.userProfile, self.clock.name_text, self.state.name_text)
+        if self.state:
+            return "{0}'s State for {1} ({2})".format(self.user_profile.display_name, self.clock.name, self.state.name)
+        else:
+            return "{0}'s State for {1}".format(self.user_profile.display_name, self.clock.name)
 
 
 class LocationCondition(models.Model):
     id = models.AutoField(primary_key=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE)
-    userProfile = models.ForeignKey(
+    user_profile = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name='user_locationCondition')
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -65,4 +69,4 @@ class LocationCondition(models.Model):
 
     def __str__(self):
         return '{0} - {1} ({2}): ({3}, {4})'\
-            .format(self.userProfile, self.state.name_text, self.state.clock.name_text, self.latitude_dec, self.longitude_dec)
+            .format(self.user_profile.display_name, self.state.name, self.state.clock.name, self.latitude, self.longitude)

@@ -16,6 +16,8 @@ Including another URLconf
 
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 from clock import views
 
 urlpatterns = [
@@ -23,17 +25,17 @@ urlpatterns = [
 	url(r'^admin/', admin.site.urls),
 	# Web Pages
 	url(r'^$', views.index, name='index'),
-	url(r'clock/(?P<clock_id>[0-9]+)/$', views.clock_view, name='clock view'),
-	url(r'create-clock/$', views.create_clock_form, name='create clock form'),
+	url(r'clock/(?P<clock_id>[0-9]+)/$', views.clock_view, name='clock_view'),
 	# Authentification
 	url(r'^sign-in', views.login_user, name='login user'),
 	url(r'^log-out', views.logout_user, name='logout user'),
+	# Forms
+	url(r'edit-clock/(?P<clock_id>[0-9]+)?$', views.clock_form, name='edit_clock'),
+	url(r'create-clock/', views.clock_form, name='create_clock'),
 	# CRUD
 	url(r'^update-location/$', views.update_location, name='update location'),
-	url(r'create-clock-object/$', views.create_clock_object, name='create clock object'),
 	url(r'^clock/(?P<clock_id>[0-9]+)/states/$', views.get_states_from_clock_id, name='get states for clock'),
 	url(r'^clock/(?P<clock_id>[0-9]+)/current-states/$', views.get_current_states_from_clock_id, name='get states for clock'),
-	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage states'),
-	# url(r'^clock/(?P<clock_id>[0-9]+)/manage-states-post/$', views.manage_states_post, name='manage states post')
-	url(r'^clock/manage-states-post/$', views.manage_states_post, name='manage states post')
+	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage states')
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
