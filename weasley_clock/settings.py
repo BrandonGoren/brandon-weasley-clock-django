@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap3',
+    'crispy_forms',
     'clock'
 ]
 
@@ -123,3 +123,5 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT='/Users/brandon/Documents/Programming/weasley_clock/clock/media'
 MEDIA_URL='/media/'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

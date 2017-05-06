@@ -7,7 +7,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='Password', widget=forms.PasswordInput())
 
 
-class NewClockForm(forms.Form):
+class ClockForm(forms.Form):
     name = forms.CharField(label='Clock Name')
 
 
