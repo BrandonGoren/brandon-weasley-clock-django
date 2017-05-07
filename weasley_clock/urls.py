@@ -27,14 +27,14 @@ urlpatterns = [
 	url(r'^$', views.index, name='index'),
 	url(r'clock/(?P<clock_id>[0-9]+)/$', views.clock_view, name='clock_view'),
 	# Authentification
-	url(r'^sign-in', views.login_user, name='login user'),
-	url(r'^log-out', views.logout_user, name='logout user'),
+	url(r'^sign-in', views.login_user, name='login_user'),
+	url(r'^log-out', views.logout_user, name='logout_user'),
 	# Forms
 	url(r'edit-clock/(?P<clock_id>[0-9]+)?$', views.clock_form, name='edit_clock'),
 	url(r'create-clock/', views.clock_form, name='create_clock'),
-	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage states'),
+	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage_states'),
 	# CRUD
 	url(r'delete-clock/', views.delete_clock, name='delete_clock'),
-	url(r'^update-location/$', views.update_location, name='update location')
+	url(r'^update-location/$', views.update_location, name='update_location')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
