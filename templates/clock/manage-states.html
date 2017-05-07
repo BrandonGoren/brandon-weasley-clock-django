@@ -16,4 +16,5 @@
   {% csrf_token %}
   <input type="submit" class="btn btn-primary btn-lg float-right mt-3" value="Submit">
 </form>
+<a href="/clock/{{ clock.id }}" class="btn btn-secondary btn-lg mt-3">Cancel</a>
 {% endblock %}

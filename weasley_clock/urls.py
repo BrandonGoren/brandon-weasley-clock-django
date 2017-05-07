@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from clock import views
+from clock.views import LocationConditionList
 
 urlpatterns = [
 	# Admin
@@ -33,8 +34,12 @@ urlpatterns = [
 	url(r'edit-clock/(?P<clock_id>[0-9]+)?$', views.clock_form, name='edit_clock'),
 	url(r'create-clock/', views.clock_form, name='create_clock'),
 	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage_states'),
+	url(r'^clock/(?P<clock_id>[0-9]+)/location-conditions/create$', views.location_condition_form, name='new_location_condition'),
+	url(r'^clock/(?P<clock_id>[0-9]+)/location-conditions/(?P<location_condition_id>[0-9]+)$', views.location_condition_form, name='edit_location_condition'),
+	url(r'^clock/(?P<clock_id>[0-9]+)/location-conditions/$', LocationConditionList.as_view(), name='location-conditions'),
 	# CRUD
 	url(r'delete-clock/', views.delete_clock, name='delete_clock'),
+	url(r'delete-location-condition/', views.delete_location_condition, name='delete_location_condition'),
 	url(r'^update-location/$', views.update_location, name='update_location')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

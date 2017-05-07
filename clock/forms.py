@@ -1,6 +1,6 @@
 from django.forms import ModelForm, Form, PasswordInput, CharField, IntegerField, ValidationError
 from django.forms.formsets import BaseFormSet
-from clock.models import Clock, State
+from clock.models import Clock, State, LocationCondition
 
 
 class LoginForm(Form):
@@ -13,6 +13,13 @@ class ClockForm(ModelForm):
     class Meta:
         model = Clock
         fields = ('name', 'description')
+
+
+class LocationConditionForm(ModelForm):
+
+    class Meta:
+        model = LocationCondition
+        fields = ('state', 'place_name')
 
 
 class StateForm(ModelForm):

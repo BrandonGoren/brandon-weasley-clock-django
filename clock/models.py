@@ -62,6 +62,7 @@ class LocationCondition(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     user_profile = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name='user_locationCondition')
+    place_name = models.CharField(max_length=100)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     radius_miles = models.FloatField()

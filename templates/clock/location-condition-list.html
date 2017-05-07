@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Your Location Conditions for {{clock.name}}{% endblock %}
+{% block content %}
+<h1 class="text-primary">Your Location Conditions for {{ clock.name }}</h1>
+{% regroup location_conditions by state as state_conditions %}
+{% for state in state_conditions %}
+<div class="card">
+  <div class="card-block">
+    <h3>{{ state.grouper.name }}</h3>
+    <ul>
+    {% for condition in state.list %}
+    <li>
+      When within {{ condition.radius_miles }} miles of {{ condition.place_name }}
+      (<a href="/clock/{{ clock.id }}/location-conditions/{{ condition.id}}">Edit</a>)
+    </li>
+    {% endfor %}
+  </ul>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+  <div class="card-block">
+    <h3>No location conditions available</h3>
+  </div>
+</div>
+{% endfor %}
+<div class="mt-3">
+  <a href="/clock/{{ clock.id }}" class="btn btn-secondary btn-lg">Go Back</a>
+  <a href="/clock/{{ clock.id }}/location-conditions/create" class="btn btn-primary btn-lg float-right">Create New Condition</a>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% load crispy_forms_tags static %}
+{% block title %}
+  {% if form.instance.id %}
+  Edit Location Condition
+  {% else %}
+  Create Location Condition
+  {% endif %}
+{% endblock %}
+{% block content %}
+{% if form.instance.id %}
+<h1>Edit Location Condition</h1>
+{% else %}
+<h1>Create Location Condition</h1>
+{% endif %}
+<form action="/clock/{{ clock.id }}/location-conditions/{{ form.instance.id|default:"create"  }}" method="POST" id="form">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <div id="div_id_radius_miles" class="form-group"> <label for="id_radius_miles" class="form-control-label  requiredField">
+                Radius (miles)<span class="asteriskField">*</span> </label>
+    <input type="number" name="radius_miles" value="{{ form.instance.radius_miles }}" required class="textinput textInput form-control" step="0.01" id="id_radius" />
+  </div>
+  <div id="map"></div>
+  <div id="infowindow-content"> <span id="place-name" class="title"></span>
+    <br> <span id="place-address"></span> </div>
+  <input type="hidden" name="latitude" id="id_lat" value="{{ form.instance.latitude }}">
+  <input type="hidden" name="longitude" id="id_lng" value="{{ form.instance.longitude }}">
+  <input type="submit" class="btn btn-primary btn-lg float-right mt-3" id="submit" value="Submit">
+</form>
+{% if form.instance.id %}
+<form action="/delete-location-condition/" method="POST">
+  {% csrf_token %}
+  <a href="/clock/{{ clock.id }}/location-conditions/" class="btn btn-secondary btn-lg mt-3">Cancel</a>
+  <input type="hidden" name="clock_id" value={{ clock.id }} />
+    <input type="hidden" name="location_condition_id" value={{ form.instance.id }} />
+  <input type="submit" class="btn btn-danger text-white btn-lg mt-3" value="Delete" </input>
+</form>
+{% else %}
+<a href="/clock/{{ clock.id }}/location-conditions/" class="btn btn-secondary btn-lg mt-3">Cancel</a> {% endif %}
+<script src="{% static 'clock/js/location-condition-map.js' %}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5oD_DeJn89nUF8Ka-P2swqZ5ToN1hwAQ&libraries=places&callback=initMap" async defer></script>
+{% endblock %}
