@@ -1,12 +1,29 @@
 {% extends 'base.html' %} {% load crispy_forms_tags %}
+{% block title %}
+  {% if form.instance.id %}
+    Edit {{form.instance}}
+  {% else %}
+    Create Clock
+  {% endif %}
+{% endblock %}
 {% block content %}
 {% if form.instance.id %}
 <h1>Edit {{form.instance}}</h1>
 {% else %}
 <h1>Create New Clock</h1>
 {% endif %}
-<form action="/edit-clock/{{form.instance.id|default:""  }}" method="POST">
+<form action="/edit-clock/{{ form.instance.id|default:""  }}" method="POST">
   {% csrf_token %} {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="Submit">
+    <input type="submit" class="btn btn-primary btn-lg float-right" value="Submit">
 </form>
+{% if form.instance.id %}
+<form action="/delete-clock/" method="POST">
+  {% csrf_token %}
+  <a href="/clock/{{ form.instance.id }}" class="btn btn-secondary btn-lg">Cancel</a>
+  <input type="hidden" name="clock_id" value={{ form.instance.id }} />
+<input type="submit" class="btn btn-danger text-white btn-lg" value="Delete Clock"</input>
+</form>
+{% else %}
+<a href="/" class="btn btn-secondary btn-lg">Cancel</a>
+{% endif %}
 {% endblock %}

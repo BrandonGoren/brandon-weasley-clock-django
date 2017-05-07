@@ -32,10 +32,9 @@ urlpatterns = [
 	# Forms
 	url(r'edit-clock/(?P<clock_id>[0-9]+)?$', views.clock_form, name='edit_clock'),
 	url(r'create-clock/', views.clock_form, name='create_clock'),
+	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage states'),
 	# CRUD
-	url(r'^update-location/$', views.update_location, name='update location'),
-	url(r'^clock/(?P<clock_id>[0-9]+)/states/$', views.get_states_from_clock_id, name='get states for clock'),
-	url(r'^clock/(?P<clock_id>[0-9]+)/current-states/$', views.get_current_states_from_clock_id, name='get states for clock'),
-	url(r'^clock/(?P<clock_id>[0-9]+)/manage-states/$', views.manage_states, name='manage states')
+	url(r'delete-clock/', views.delete_clock, name='delete_clock'),
+	url(r'^update-location/$', views.update_location, name='update location')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

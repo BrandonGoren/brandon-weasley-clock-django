@@ -21,10 +21,12 @@ def index(request):
         context = {'form': LoginForm()}
         return render(request, 'clock/sign-in.html', context)
 
+
 def clock_view(request, clock_id):
     clock = Clock.objects.get(id=clock_id)
     states = State.objects.filter(clock=clock)
-    current_states = CurrentState.objects.filter(clock=clock).order_by('position')
+    current_states = CurrentState.objects.filter(
+        clock=clock).order_by('position')
     context = {
         'clock': clock,
         'states': states,
@@ -45,12 +47,17 @@ def clock_form(request, clock_id=None):
             if form.is_valid():
                 clock = form.save()
                 if new_clock:
-                    requester_profile = UserProfile.objects.get(user=request.user)
+                    requester_profile = UserProfile.objects.get(
+                        user=request.user)
                     clock.user_profiles.add(requester_profile)
                     clock.save()
+                    State.objects.create(clock=clock, name='Home', position=0)
+                    State.objects.create(clock=clock, name='Work', position=4)
+                    State.objects.create(
+                        clock=clock, name='Mortal Peril', position=8)
                     CurrentState.objects.create(
                         clock=clock, user_profile=requester_profile)
-                return redirect('/clock/{0}'.format(clock.id))
+                return redirect('/clock/{id}'.format(id=clock.id))
             else:
                 return render(request, 'clock/clock-form.html', {'form': form})
         else:
@@ -63,6 +70,38 @@ def clock_form(request, clock_id=None):
     else:
         context = {'form': LoginForm()}
         return render(request, 'clock/sign-in.html', context)
+
+
+def delete_clock(request):
+    if request.user.is_authenticated and request.method == 'POST':
+        clock = Clock.objects.get(id=request.POST.get('clock_id'))
+        if clock.has_permission(request.user.username):
+            clock.delete()
+            return redirect('/')
+    return HttpResponse(status=550)
+
+
+def manage_states(request, clock_id):
+    StateFormSet = modelformset_factory(
+        State, exclude=('id', 'clock'), can_delete=True)
+    clock = Clock.objects.get(id=clock_id)
+    if request.method == 'GET':
+        states = State.objects.filter(clock__id=clock_id)
+        formset = StateFormSet(queryset=states)
+        return render(request, 'clock/manage-states.html', {
+            'clock': clock,
+            'formset': formset
+        })
+    else:
+        formset = StateFormSet(request.POST, request.FILES)
+        if formset.is_valid():
+            for form in formset:
+                if form.is_valid() and not form.empty_permitted:
+                    form.instance.clock = clock
+                    form.save()
+            for form in formset.deleted_forms:
+                form.instance.delete()
+    return redirect('/clock/{id}'.format(id=clock_id))
 
 
 @csrf_exempt
@@ -78,78 +117,11 @@ def update_location(request):
                 condition.radius_miles:
             potential_clock_states_to_change.append(
                 (condition.state.clock, condition.state))
-    for clockState in potential_clock_states_to_change:
+    for clock_state in potential_clock_states_to_change:
         current_state = CurrentState.objects.get(
-            clock=clockState[0], user_profile__user__username=username)
-        current_state.state = clockState[1]
-        current_state.last_modified = timezone.now()
+            clock=clock_state[0], user_profile__user__username=username)
+        current_state.state = clock_state[1]
         current_state.save()
-    return HttpResponse(status=200)
-
-
-def get_states_from_clock_id(request, clock_id):
-    username = request.POST['username']
-    clock = Clock.objects.get(id=clock_id)
-    if clock.has_permission(username):
-        return HttpResponse(serializers.serialize('json', State.objects.filter(clock__id=clock_id)))
-    else:
-        return HttpResponse(status=550)
-
-
-def get_current_states_from_clock_id(request, clock_id):
-    username = request.POST['username']
-    clock = Clock.objects.get(id=clock_id)
-    if clock.has_permission(username):
-        return HttpResponse(serializers.serialize('json', CurrentState.objects.filter(clock__id=clock_id)))
-    else:
-        return HttpResponse(status=550)
-
-
-def get_user_profiles_from_clock_id(request, clock_id):
-    username = request.POST('username')
-    clock = Clock.objects.get(id=clock_id)
-    if clock.has_permission(username):
-        return HttpResponse(serializers.serialize('json', clock.user_profiles.all()))
-    else:
-        return HttpResponse(status=550)
-
-
-def add_user_to_clock(requester, clock_id):
-    user_profile = UserProfile.objects.get(user__username=requester)
-    clock = Clock.objects.get(id=clock_id)
-    clock.user_profiles.add(user_profile)
-    clock.save()
-    CurrentState.objects.create(clock=clock, user_profile=user_profile)
-    return HttpResponse(status=200)
-
-
-def manage_states(request, clock_id):
-    clock = Clock.objects.get(id=clock_id)
-    manage_states = modelformset_factory(State, exclude=('id', 'clock'))
-    states = State.objects.filter(clock__id=clock_id)
-    formset = manage_states(queryset=states)
-    return render(request, 'clock/manage-states.html', {
-        'clock': clock,
-        'formset': formset
-    })
-
-
-def create_state(request, clock_id):
-    name = request.POST['name']
-    position = request.POST['position']
-    clock = Clock.objects.get(id=clock_id)
-    State.objects.create(clock=clock, name_text=name, position_int=position)
-    return HttpResponse(status=200)
-
-
-def update_current_state(request):
-    current_state_id = request.POST['current_state_id']
-    state_id = request.POST['state_id']
-    state = State.objects.get(id=state_id)
-    current_state = CurrentState.objects.get(id=current_state_id)
-    current_state.state = state
-    current_state.lastChanged_datetime = timezone.now()
-    current_state.save()
     return HttpResponse(status=200)
 
 

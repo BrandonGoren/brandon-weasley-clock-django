@@ -1,6 +1,7 @@
 .avatar-state-img {
-  width: 50px;
-  max-height: 100px;
+  width: 75px;
+  height: 75px;
+  object-fit: cover;
 }
 
 .vertical-align {
